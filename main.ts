@@ -190,7 +190,7 @@ if (doTitle) {
     titleText = sprites.create(assets.image`logo`, SpriteKind.title)
     titleText.setPosition(82, 20)
     fancyText.draw("Press A to Begin", scene.backgroundImage(), 10, 40, 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
-    fancyText.draw("Demo 1.0", scene.backgroundImage(), 10, 220, 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
+    fancyText.draw("Demo 1.0.0", scene.backgroundImage(), 10, 220, 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
     music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
     pauseUntil(() => !(controller.A.isPressed()))
     pauseUntil(() => controller.A.isPressed())
