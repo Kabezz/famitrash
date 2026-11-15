@@ -4,17 +4,20 @@ namespace SpriteKind {
     export const title = SpriteKind.create()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.smallSpikeHitbox, function (sprite, otherSprite) {
-    sprites.destroy(cube)
-    refreshGame()
+    if (!(deadthded)) {
+        deathded()
+    }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.largeSpikeHitbox, function (sprite, otherSprite) {
-    sprites.destroy(cube)
-    refreshGame()
+    if (!(deadthded)) {
+        deathded()
+    }
 })
 function refreshGame () {
+    deadthded = false
     music.stopAllSounds()
     scene.setBackgroundImage(assets.image`bg`)
-    scroller.setCameraScrollingMultipliers(0.2, 0)
+    scroller.setCameraScrollingMultipliers(0.2, 0.2)
     cube = sprites.create(assets.image`cube0`, SpriteKind.Player)
     animation.runImageAnimation(
     cube,
@@ -22,8 +25,8 @@ function refreshGame () {
     33,
     true
     )
-    tiles.setCurrentTilemap(tilemap`test1`)
-    cube.setPosition(0, 180)
+    tiles.setCurrentTilemap(tilemap`stereo1`)
+    cube.setPosition(0, 430)
     cube.vx = 166
     cube.ay = 1440
     for (let value of tiles.getTilesByType(assets.tile`largeSpike`)) {
@@ -114,18 +117,44 @@ function createColors () {
     "000000"
     ]
 }
+function deathded () {
+    deadthded = true
+    cube.vy = 0
+    cube.vx = 0
+    cube.ay = 0
+    music.stopAllSounds()
+    animation.runImageAnimation(
+    cube,
+    assets.animation`explode`,
+    66,
+    false
+    )
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
+    sprites.destroy(cube)
+    pause(100)
+    refreshGame()
+}
 let colors: string[] = []
 let smallSpriteHitbox: Sprite = null
 let largeSpikeHitbox2: Sprite = null
 let cube: Sprite = null
+let deadthded = false
+let subtitleText: fancyText.TextSprite = null
+let titleText: Sprite = null
 let warningText: fancyText.TextSprite = null
-let inGame = false
-let doWarning = true
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320;
     export const ARCADE_SCREEN_HEIGHT = 240;
 }
-if (doWarning) {
+let inGame = false
+let doTitle = true
+createColors()
+if (doTitle) {
     scene.setBackgroundImage(assets.image`warningScreen`)
     color.setColor(11, color.rgb(0, 0, 0))
     fancyText.draw("Screen Resolution Warning", scene.backgroundImage(), 16, 20, 0, 1, fancyText.geometric_sans_6)
@@ -140,32 +169,30 @@ if (doWarning) {
     color.originalPalette
     )
     music.stopAllSounds()
+    scene.setBackgroundImage(assets.image`bg`)
+    scene.setBackgroundColor(6)
+    titleText = sprites.create(assets.image`logo`, SpriteKind.title)
+    titleText.setPosition(82, 20)
+    subtitleText = fancyText.create("Press A to Begin", 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
+    subtitleText.setPosition(68, 40)
+    music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
+    pauseUntil(() => !(controller.A.isPressed()))
+    pauseUntil(() => controller.A.isPressed())
+    music.stopAllSounds()
+    sprites.destroy(titleText)
+    sprites.destroy(subtitleText)
+    music.play(music.melodyPlayable(music.buzzer), music.PlaybackMode.UntilDone)
 }
-scene.setBackgroundImage(assets.image`bg`)
-createColors()
-scene.setBackgroundColor(6)
-let titleText = sprites.create(assets.image`logo`, SpriteKind.title)
-titleText.setPosition(82, 20)
-let subtitleText = fancyText.create("Press A to Begin", 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
-subtitleText.setPosition(68, 40)
-music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
-pauseUntil(() => !(controller.A.isPressed()))
-pauseUntil(() => controller.A.isPressed())
-music.stopAllSounds()
-sprites.destroy(titleText)
-sprites.destroy(subtitleText)
-music.play(music.melodyPlayable(music.buzzer), music.PlaybackMode.UntilDone)
 inGame = true
 refreshGame()
 game.onUpdate(function () {
     pauseUntil(() => inGame)
-    scene.centerCameraAt(cube.x + 60, cube.y)
-    if (cube.vx == 0) {
-        sprites.destroy(cube)
-        refreshGame()
-    }
-    if (cube.vy == 0) {
+    scene.centerCameraAt(cube.x + 60, cube.y + 50)
+    if (cube.vy == 0 && !(deadthded)) {
         cube.setImage(assets.image`cube0`)
+    }
+    if (cube.vx == 0 && !(deadthded)) {
+        deathded()
     }
 })
 forever(function () {
