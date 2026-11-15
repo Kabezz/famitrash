@@ -1,6 +1,7 @@
 namespace SpriteKind {
     export const largeSpikeHitbox = SpriteKind.create()
     export const smallSpikeHitbox = SpriteKind.create()
+    export const title = SpriteKind.create()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.smallSpikeHitbox, function (sprite, otherSprite) {
     sprites.destroy(cube)
@@ -117,31 +118,35 @@ let colors: string[] = []
 let smallSpriteHitbox: Sprite = null
 let largeSpikeHitbox2: Sprite = null
 let cube: Sprite = null
+let warningText: fancyText.TextSprite = null
+let inGame = false
+let doWarning = true
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320;
     export const ARCADE_SCREEN_HEIGHT = 240;
 }
-let inGame = false
-scene.setBackgroundImage(assets.image`warningScreen`)
-color.setColor(11, color.rgb(0, 0, 0))
-fancyText.draw("Screen Resolution Warning", scene.backgroundImage(), 16, 20, 0, 1, fancyText.geometric_sans_6)
-let warningText = fancyText.create("This game is designed to be viewed at a resolution of 320x240. It is recommended to play this on an online simulator as any hardware might show only a portion of the screen.\\n\\n        Press A to Continue", 150, 1, fancyText.tiny_4)
-warningText.x = 83
-warningText.y = 60
-fancyText.setLineHeight(warningText, 5)
-music.play(pianoRoll.createSong(assets.song`schemingweasel`), music.PlaybackMode.LoopingInBackground)
-pauseUntil(() => controller.A.isPressed())
-sprites.destroy(warningText)
-color.setPalette(
-color.originalPalette
-)
-music.stopAllSounds()
+if (doWarning) {
+    scene.setBackgroundImage(assets.image`warningScreen`)
+    color.setColor(11, color.rgb(0, 0, 0))
+    fancyText.draw("Screen Resolution Warning", scene.backgroundImage(), 16, 20, 0, 1, fancyText.geometric_sans_6)
+    warningText = fancyText.create("This game is designed to be viewed at a resolution of 320x240. It is recommended to play this on an online simulator as any hardware might show only a portion of the screen.\\n\\n        Press A to Continue", 150, 1, fancyText.tiny_4)
+    warningText.x = 83
+    warningText.y = 60
+    fancyText.setLineHeight(warningText, 5)
+    music.play(pianoRoll.createSong(assets.song`schemingweasel`), music.PlaybackMode.LoopingInBackground)
+    pauseUntil(() => controller.A.isPressed())
+    sprites.destroy(warningText)
+    color.setPalette(
+    color.originalPalette
+    )
+    music.stopAllSounds()
+}
 scene.setBackgroundImage(assets.image`bg`)
 createColors()
 scene.setBackgroundColor(6)
-let titleText = fancyText.create("Famitrash", 0, 8, fancyText.rounded_large)
-titleText.setPosition(63, 20)
-let subtitleText = fancyText.create("Press A to Begin", 0, 8, fancyText.rounded_small)
+let titleText = sprites.create(assets.image`logo`, SpriteKind.title)
+titleText.setPosition(82, 20)
+let subtitleText = fancyText.create("Press A to Begin", 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
 subtitleText.setPosition(68, 40)
 music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
 pauseUntil(() => !(controller.A.isPressed()))
