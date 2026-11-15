@@ -2,6 +2,7 @@ namespace SpriteKind {
     export const largeSpikeHitbox = SpriteKind.create()
     export const smallSpikeHitbox = SpriteKind.create()
     export const title = SpriteKind.create()
+    export const groundSpikeHitbox = SpriteKind.create()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.smallSpikeHitbox, function (sprite, otherSprite) {
     if (!(deadthded)) {
@@ -17,6 +18,7 @@ function refreshGame () {
     deadthded = false
     music.stopAllSounds()
     scene.setBackgroundImage(assets.image`bg`)
+    scroller.scrollBackgroundWithCamera(scroller.CameraScrollMode.BothDirections)
     scroller.setCameraScrollingMultipliers(0.2, 0.2)
     cube = sprites.create(assets.image`cube0`, SpriteKind.Player)
     animation.runImageAnimation(
@@ -28,14 +30,23 @@ function refreshGame () {
     tiles.setCurrentTilemap(tilemap`stereo1`)
     cube.setPosition(0, 430)
     cube.vx = 166
-    cube.ay = 1440
+    cube.ay = 1350
+    scene.centerCameraAt(cube.x + 60, cube.y)
     for (let value of tiles.getTilesByType(assets.tile`largeSpike`)) {
         largeSpikeHitbox2 = sprites.create(assets.image`largeSpikeHitbox`, SpriteKind.largeSpikeHitbox)
         tiles.placeOnTile(largeSpikeHitbox2, value)
     }
     for (let value2 of tiles.getTilesByType(assets.tile`smallSpike`)) {
-        smallSpriteHitbox = sprites.create(assets.image`smallSpikeHitbox`, SpriteKind.smallSpikeHitbox)
-        tiles.placeOnTile(smallSpriteHitbox, value2)
+        smallSpikeHitbox2 = sprites.create(assets.image`smallSpikeHitbox`, SpriteKind.smallSpikeHitbox)
+        tiles.placeOnTile(smallSpikeHitbox2, value2)
+    }
+    for (let value2 of tiles.getTilesByType(assets.tile`groundSpike0`)) {
+        groundSpikeHitbox2 = sprites.create(assets.image`groundSpikeHitbox`, SpriteKind.groundSpikeHitbox)
+        tiles.placeOnTile(groundSpikeHitbox2, value2)
+    }
+    for (let value2 of tiles.getTilesByType(assets.tile`groundSpike1`)) {
+        groundSpikeHitbox2 = sprites.create(assets.image`groundSpikeHitbox`, SpriteKind.groundSpikeHitbox)
+        tiles.placeOnTile(groundSpikeHitbox2, value2)
     }
     _("level colors")
     color.setColor(6, color.parseColorString("001084"))
@@ -122,13 +133,13 @@ function deathded () {
     cube.vy = 0
     cube.vx = 0
     cube.ay = 0
-    music.stopAllSounds()
     animation.runImageAnimation(
     cube,
     assets.animation`explode`,
     66,
     false
     )
+    music.stopAllSounds()
     music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 3373, 171, 255, 0, 330, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
@@ -139,12 +150,17 @@ function deathded () {
     pause(100)
     refreshGame()
 }
-let colors: string[] = []
-let smallSpriteHitbox: Sprite = null
+sprites.onOverlap(SpriteKind.Player, SpriteKind.groundSpikeHitbox, function (sprite, otherSprite) {
+    if (!(deadthded)) {
+        deathded()
+    }
+})
+let groundSpikeHitbox2: Sprite = null
+let smallSpikeHitbox2: Sprite = null
 let largeSpikeHitbox2: Sprite = null
 let cube: Sprite = null
 let deadthded = false
-let subtitleText: fancyText.TextSprite = null
+let colors: string[] = []
 let titleText: Sprite = null
 let warningText: fancyText.TextSprite = null
 namespace userconfig {
@@ -158,7 +174,7 @@ if (doTitle) {
     scene.setBackgroundImage(assets.image`warningScreen`)
     color.setColor(11, color.rgb(0, 0, 0))
     fancyText.draw("Screen Resolution Warning", scene.backgroundImage(), 16, 20, 0, 1, fancyText.geometric_sans_6)
-    warningText = fancyText.create("This game is designed to be viewed at a resolution of 320x240. It is recommended to play this on an online simulator as any hardware might show only a portion of the screen.\\n\\n        Press A to Continue", 150, 1, fancyText.tiny_4)
+    warningText = fancyText.create("This game is designed to be viewed at a resolution of 320x240. It is recommended to play this on an online simulator as any hardware might show only a portion of the screen, in which case, is this portion. If you do not see excess black space around the screen, then please use the Online Simulator to play this game.\\n\\n        Press A to Continue", 150, 1, fancyText.tiny_4)
     warningText.x = 83
     warningText.y = 60
     fancyText.setLineHeight(warningText, 5)
@@ -173,23 +189,32 @@ if (doTitle) {
     scene.setBackgroundColor(6)
     titleText = sprites.create(assets.image`logo`, SpriteKind.title)
     titleText.setPosition(82, 20)
-    subtitleText = fancyText.create("Press A to Begin", 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
-    subtitleText.setPosition(68, 40)
+    fancyText.draw("Press A to Begin", scene.backgroundImage(), 10, 40, 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
+    fancyText.draw("Demo 1.0", scene.backgroundImage(), 10, 220, 0, fancyText.twoToneColor(9, 12), fancyText.outline_two_tone_12)
     music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
     pauseUntil(() => !(controller.A.isPressed()))
     pauseUntil(() => controller.A.isPressed())
     music.stopAllSounds()
-    sprites.destroy(titleText)
-    sprites.destroy(subtitleText)
+    _("level colors")
+    color.setColor(6, color.parseColorString("001084"))
+    color.setColor(9, color.parseColorString("0042C6"))
+    _("icon colors")
+    color.setColor(7, color.parseColorString(colors[41]))
+    color.setColor(8, color.parseColorString(colors[44]))
+    color.setColor(2, color.parseColorString(colors[15]))
     music.play(music.melodyPlayable(music.buzzer), music.PlaybackMode.UntilDone)
+    sprites.destroy(titleText)
 }
 inGame = true
 refreshGame()
 game.onUpdate(function () {
     pauseUntil(() => inGame)
-    scene.centerCameraAt(cube.x + 60, cube.y + 50)
+    scene.centerCameraAt(cube.x + 60, scene.cameraProperty(CameraProperty.Y) + 0.1 * (cube.y - scene.cameraProperty(CameraProperty.Y)))
     if (cube.vy == 0 && !(deadthded)) {
         cube.setImage(assets.image`cube0`)
+    }
+    if (cube.vy > 397) {
+        cube.vy = 397
     }
     if (cube.vx == 0 && !(deadthded)) {
         deathded()
