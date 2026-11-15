@@ -121,8 +121,22 @@ namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320;
     export const ARCADE_SCREEN_HEIGHT = 240;
 }
-scene.setBackgroundImage(assets.image`bg`)
 let inGame = false
+scene.setBackgroundImage(assets.image`warningScreen`)
+color.setColor(11, color.rgb(0, 0, 0))
+fancyText.draw("Screen Resolution Warning", scene.backgroundImage(), 16, 20, 0, 1, fancyText.geometric_sans_6)
+let warningText = fancyText.create("This game is designed to be viewed at a resolution of 320x240. It is recommended to play this on an online simulator as any hardware might show only a portion of the screen.\\n\\n        Press A to Continue", 150, 1, fancyText.tiny_4)
+warningText.x = 83
+warningText.y = 60
+fancyText.setLineHeight(warningText, 5)
+music.play(pianoRoll.createSong(assets.song`schemingweasel`), music.PlaybackMode.LoopingInBackground)
+pauseUntil(() => controller.A.isPressed())
+sprites.destroy(warningText)
+color.setPalette(
+color.originalPalette
+)
+music.stopAllSounds()
+scene.setBackgroundImage(assets.image`bg`)
 createColors()
 scene.setBackgroundColor(6)
 let titleText = fancyText.create("Famitrash", 0, 8, fancyText.rounded_large)
@@ -130,6 +144,7 @@ titleText.setPosition(63, 20)
 let subtitleText = fancyText.create("Press A to Begin", 0, 8, fancyText.rounded_small)
 subtitleText.setPosition(68, 40)
 music.play(pianoRoll.createSong(assets.song`menu1`), music.PlaybackMode.LoopingInBackground)
+pauseUntil(() => !(controller.A.isPressed()))
 pauseUntil(() => controller.A.isPressed())
 music.stopAllSounds()
 sprites.destroy(titleText)
