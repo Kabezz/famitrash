@@ -1,5 +1,6 @@
 {
     "name": "Famitrash",
+    "version": "1.0.0",
     "description": "Introducing MakeCode Dash! A new demake of Geometry Dash for the Microsoft MakeCode Arcade!",
     "dependencies": {
         "device": "*",
